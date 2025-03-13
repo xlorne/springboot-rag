@@ -12,4 +12,5 @@ public class RAGConfiguration {
     public ChatMemory chatMemory() {
         return new InMemoryChatMemory();
     }
+
 }

@@ -1,5 +1,6 @@
 package com.codingapi.rag;
 
+import com.codingapi.rag.etl.DocumentService;
 import com.codingapi.rag.service.ChatService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -14,12 +15,21 @@ public class SpringbootRagApplication {
         SpringApplication.run(SpringbootRagApplication.class, args);
     }
 
-
     @Bean
-    public CommandLineRunner commandLineRunner(ChatService chatService,ConfigurableApplicationContext ctx) {
+    public CommandLineRunner commandLineRunner(ChatService chatService,
+                                               DocumentService documentService,
+                                               ConfigurableApplicationContext ctx) {
+
         return args -> {
-            String answer = chatService.ask("1","你好");
-            System.out.println(answer);
+            documentService.importDocuments();
+
+            String chatId = "1";
+
+            String question = "what is Trek?";
+            String answer = chatService.question(chatId,question);
+            System.out.println("question: " + question);
+            System.out.println("assistant: " + answer);
+
             ctx.close();
         };
     }
