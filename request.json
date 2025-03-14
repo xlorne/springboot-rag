@@ -1,0 +1,11 @@
+{
+  "messages": [
+    {
+      "content": "Context information is below.\n\n---------------------\nbrand: Trek\ndescription: A high-performance mountain bike for trail riding.\n---------------------\n\nGiven the context information and no prior knowledge, answer the query.\n\nFollow these rules:\n\n1. If the answer is not in the context, just say that you don't know.\n2. Avoid statements like \"Based on the context...\" or \"The provided information...\".\n\nQuery: what is Trek?\n\nAnswer:\n\n\nContext information is below, surrounded by ---------------------\n\n---------------------\nbrand: Trek\ndescription: A high-performance mountain bike for trail riding.\nbrand: Cannondale\ndescription: An aerodynamic road bike for racing enthusiasts.\n---------------------\n\nGiven the context and provided history information and not prior knowledge,\nreply to the user comment. If the answer is not in the context, inform\nthe user that you can't answer the question.\n",
+      "role": "user"
+    }
+  ],
+  "model": "qwen2.5:7b",
+  "stream": false,
+  "temperature": 0.7
+}
