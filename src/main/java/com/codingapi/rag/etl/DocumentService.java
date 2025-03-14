@@ -6,10 +6,7 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
-import org.springframework.util.DigestUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,9 +22,12 @@ public class DocumentService {
 
     private Document reBuild(Document document) {
         String text = Objects.requireNonNull(document.getText());
+        // json all data will be used as metadata
         Map<String,Object> metadata = document.getMetadata();
+
         return Document.builder()
-                .id(metadata.get("id").toString())
+                .id(metadata.get("id").toString()) // id is required and must be unique
+//                .id(DigestUtils.md5Hex(text)) // if id is not provided, can will be generated from text to md5
                 .text(text)
                 .metadata(metadata)
                 .media(document.getMedia())
@@ -41,9 +41,13 @@ public class DocumentService {
         List<Document> data =  documents.stream().map(this::reBuild).toList();
 
         vectorStore.delete(data.stream().map(Document::getId).toList());
-
+        // add data to vector store
+        // vector field
+        // 1. doc_id : document id
+        // 2. content : document text
+        // 3. metadata : document metadata
+        // 4. embedding : document text to embedding, by embedding model
         vectorStore.add(data);
-
 
         String testQuestion = "Trek";
         SearchRequest request = SearchRequest.builder()
