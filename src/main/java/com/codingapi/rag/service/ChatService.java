@@ -1,14 +1,15 @@
 package com.codingapi.rag.service;
 
+import com.codingapi.rag.milvus.retriever.HybridDocumentRetriever;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
@@ -20,29 +21,29 @@ public class ChatService {
 
     private final ChatClient chatClient;
 
-    private final VectorStore vectorStore;
+    private final HybridDocumentRetriever hybridDocumentRetriever;
 
     private final static int CHAT_MEMORY_RETRIEVE_SIZE = 1000;
 
-    public ChatService(ChatClient.Builder builder, ChatMemory chatMemory, VectorStore vectorStore) {
-        this.vectorStore = vectorStore;
-
+    public ChatService(ChatClient.Builder builder,
+                       ChatMemory chatMemory,
+                       VectorStore vectorStore,
+                       HybridDocumentRetriever hybridDocumentRetriever){
+        this.hybridDocumentRetriever = hybridDocumentRetriever;
         this.chatClient = builder
                 .defaultAdvisors(
-                        new MessageChatMemoryAdvisor(chatMemory),
-                        new QuestionAnswerAdvisor(vectorStore)
+                        new QuestionAnswerAdvisor(vectorStore),
+                        new PromptChatMemoryAdvisor(chatMemory)
                 )
                 .build();
     }
 
 
-    public String question(String chatId,String userMessage) {
+    public String question(String chatId, String userMessage) {
         Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
                 .documentRetriever(
-                        VectorStoreDocumentRetriever.builder()
-                                .similarityThreshold(0.50)
-                                .vectorStore(vectorStore)
-                                .build())
+                        hybridDocumentRetriever
+                )
                 .build();
         try {
             ChatClient.CallResponseSpec responseSpec = chatClient.prompt()
@@ -52,6 +53,7 @@ public class ChatService {
                                     .param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                                     .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, CHAT_MEMORY_RETRIEVE_SIZE)
                     )
+
                     .user(userMessage)
                     .call();
             ChatResponse chatResponse = responseSpec.chatResponse();

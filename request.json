@@ -1,0 +1,11 @@
+{
+  "messages": [
+    {
+      "content": "The user query is outside your knowledge base.\nPolitely inform the user that you can't answer it.\n\n\nContext information is below, surrounded by ---------------------\n\n---------------------\nbrand: Cannondale\ndescription: An aerodynamic road bike for racing enthusiasts.\n---------------------\n\nGiven the context and provided history information and not prior knowledge,\nreply to the user comment. If the answer is not in the context, inform\nthe user that you can't answer the question.\n",
+      "role": "user"
+    }
+  ],
+  "model": "qwen2.5:7b",
+  "stream": false,
+  "temperature": 0.7
+}
