@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Component
@@ -23,8 +25,13 @@ public class DocumentService {
 
     private Document reBuild(Document document) {
         String text = Objects.requireNonNull(document.getText());
-        String id = DigestUtils.md5DigestAsHex(text.getBytes(StandardCharsets.UTF_8));
-        return new Document(id, text, document.getMetadata());
+        Map<String,Object> metadata = document.getMetadata();
+        return Document.builder()
+                .id(metadata.get("id").toString())
+                .text(text)
+                .metadata(metadata)
+                .media(document.getMedia())
+                .build();
     }
 
     public void importDocuments() {
@@ -32,7 +39,11 @@ public class DocumentService {
         List<Document> documents = localJsonReader.loadDocument();
         documents = splitter.apply(documents);
         List<Document> data =  documents.stream().map(this::reBuild).toList();
+
+        vectorStore.delete(data.stream().map(Document::getId).toList());
+
         vectorStore.add(data);
+
 
         String testQuestion = "Trek";
         SearchRequest request = SearchRequest.builder()

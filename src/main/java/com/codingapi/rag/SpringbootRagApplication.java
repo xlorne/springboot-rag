@@ -25,12 +25,16 @@ public class SpringbootRagApplication {
 
             String chatId = "1";
 
-            String question = "what is Trek?";
-            String answer = chatService.question(chatId,question);
-            System.out.println("question: " + question);
-            System.out.println("assistant: " + answer);
+            for (int i=0;i<1;i++){
+                String question = "what is Trek?";
+                String answer = chatService.question(chatId,question);
+                System.out.println("question: " + question);
+                System.out.println("assistant: " + answer);
+            }
+
 
             ctx.close();
+            System.exit(0);
         };
     }
 }
